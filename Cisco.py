@@ -24,7 +24,7 @@ import re
 # Write network Data captured from devices to disk. 
 def write_data(hostname, netdata, command):
     try:
-        home_dir = os.path.join('/home','a0694441', 'Cisco')
+        home_dir = os.path.join('/home','PP', 'Cisco')
         os.chdir(home_dir)
         device_dir = os.path.join (hostname,datetime.datetime.now().strftime('%Y-%m-%d'))
         
