@@ -21,6 +21,8 @@ import time
 import sys
 import re
 
+
+
 # Write network Data captured from devices to disk. 
 def write_data(hostname, netdata, command):
     try:
@@ -199,7 +201,7 @@ except KeyboardInterrupt:
     
 
 #Open SSHV2 connection to the devices
-def open_ssh_conn(ip):
+def open_ssh_conn(ip,output):
     #Change Exception message                                                    
     
     try:
@@ -266,19 +268,35 @@ def open_ssh_conn(ip):
         #Splitting the commands by '&' charecter
         command_list = selected_cisco_commands.split("&")
         
+        
         #Writing each line in the command string to the device
+        print output
         for each_line in command_list:
-            connection.send(each_line +"\n")
-            time.sleep(1)
             
+            data_to_read = True
+            connection.send(each_line +"\n")
+            file_to_write = each_line
+            global data_to_write
+            data_to_write  = ""
+            while data_to_read:
+                if connection.recv_ready():
+                    data_to_write+= data_to_write + connection.recv(10000)
+                    print data_to_write
+                else:
+                    data_to_read = False
+            output+= data_to_write
+            write_data(ip, data_to_write, file_to_write)
+            time.sleep(2)      
+            
+        
         
         #Closing the user file
         selected_user_file.close()
         
-        #Checking command output for IOS syntax errors
-        output = connection.recv(65535)      
         
-        
+        #output = connection.recv(65535)
+                
+        #Checking command output for IOS syntax errors 
         if re.search(r"% Invalid input detected at", output):        
             print Fore.RED + "* There was atleast one IOS syntax error on devices %s" %ip
             
@@ -286,7 +304,7 @@ def open_ssh_conn(ip):
             print Fore.GREEN + "* All Parameters were successfully extracted from the device %s" %ip
             
         #Test for reading command output
-        #print output + "\n"
+        print output + "\n"
         
 
 
@@ -353,7 +371,8 @@ def open_ssh_conn(ip):
                 h_sec = int(j.split(' ')[0]) * 3600
             
             elif 'minute' in j:
-                m_sec = int(j.split(' ')[0]) * 60
+                m_sec = int(j.split(' ')[1]) * 60
+                #print m_sec
                 
         total_uptime_sec = y_sec+ w_sec+ d_sec + h_sec + m_sec
         #print total_uptime_sec
@@ -413,9 +432,14 @@ def open_ssh_conn(ip):
        
 
     
-# Test application  
-open_ssh_conn("192.168.2.101")
-write_data(hostname)
+# Test application
+global output
+hostname = "R1"
+netdata = "show run"
+command_output = "show-run"
+output = "global"
+open_ssh_conn("192.168.2.101",output)
+
 
 
 
