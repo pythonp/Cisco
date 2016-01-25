@@ -2,7 +2,7 @@
 ################### Running-configuration, ARP table, MAC table, MAC to IP mapping,
 ################### Route Table, Dynmaic Routing Protocol, Routing Protocol Neighbors,
 ################### Interface status, VLAN port assignments, CDP Neighbors, 
-################### Interface Utilization, Device Inventory
+################### Interface Utilization, Device Inventory.""In Development""
                                                          
 
 # Configure the permissions on the script first ! 'chmod 755 NetInv.py'
